@@ -11,7 +11,7 @@ tri: Triangle
 Vec3 :: [3]f32
 Triangle :: [3]Vec3
 
-a, b: gc.Collider
+a, b, c: gc.Collider
 
 init :: proc() {
 	camera = rl.Camera3D {
@@ -22,20 +22,25 @@ init :: proc() {
 
 	a = gc.Collision_Poly {
 		points = {
-			{1, 1, 1},
-			{-1, 1, 1},
-			{-1, 1, -1},
-			{1, 1, -1},
-			{1, -1, -1},
-			{1, -1, 1},
-			{-1, -1, 1},
-			{-1, -1, -1},
+			{6, 1, 1},
+			{4, 1, 1},
+			{4, 1, -1},
+			{6, 1, -1},
+			{6, -1, -1},
+			{6, -1, 1},
+			{4, -1, 1},
+			{4, -1, -1},
 		},
 	}
 
 	b = gc.Collision_Sphere {
 		center = {0, 0, 0},
 		radius = 0.5,
+	}
+
+	c = gc.Collision_Sphere {
+		center = {-2, 0, 0},
+		radius = 0.7,
 	}
 
 	// tri = {{-1, 2, 0}, {2, 1, -1}, {-1, 0, 1}}
@@ -61,6 +66,7 @@ handle_colliders :: proc() {
 	sphere.center += move_delta * delta
 
 	if overlap, simplex := gc.gjk(a, b); overlap {
+		draw_simplex(simplex)
 		mtv := gc.solve_epa(simplex, a, b)
 		fmt.printfln("MTV %v", mtv)
 	}
@@ -69,6 +75,7 @@ handle_colliders :: proc() {
 draw_colliders :: proc() {
 	cube := a.(gc.Collision_Poly)
 	sphere := b.(gc.Collision_Sphere)
+	sphere2 := c.(gc.Collision_Sphere)
 
 	for i in 0 ..< 7 {
 		rl.DrawLine3D(cube.points[i], cube.points[i + 1], rl.BEIGE)
@@ -77,6 +84,7 @@ draw_colliders :: proc() {
 	rl.DrawLine3D(cube.points[0], cube.points[7], rl.BEIGE)
 	rl.DrawSphere(cube.points[7], 0.1, rl.BEIGE)
 	rl.DrawSphere(sphere.center, sphere.radius, rl.GOLD)
+	// rl.DrawSphere(sphere2.center, sphere2.radius, rl.BROWN)
 }
 
 main :: proc() {
@@ -91,17 +99,31 @@ main :: proc() {
 	}
 }
 
+draw_simplex :: proc(simplex: gc.Simplex) {
+	rl.DrawSphere(simplex.a, 0.1, rl.GREEN)
+	rl.DrawSphere(simplex.b, 0.1, rl.GREEN)
+	rl.DrawSphere(simplex.c, 0.1, rl.GREEN)
+	rl.DrawSphere(simplex.d, 0.1, rl.GREEN)
+
+	rl.DrawLine3D(simplex.a, simplex.b, rl.GREEN)
+	rl.DrawLine3D(simplex.a, simplex.c, rl.GREEN)
+	rl.DrawLine3D(simplex.a, simplex.d, rl.GREEN)
+	rl.DrawLine3D(simplex.b, simplex.c, rl.GREEN)
+	rl.DrawLine3D(simplex.b, simplex.d, rl.GREEN)
+	rl.DrawLine3D(simplex.c, simplex.d, rl.GREEN)
+}
+
 update :: proc() {
-	handle_colliders()
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.BLACK)
 	rl.BeginMode3D(camera)
-	rl.DrawSphere(tri[0], 0.1, rl.WHITE)
-	rl.DrawSphere(tri[1], 0.1, rl.YELLOW)
-	rl.DrawSphere(tri[2], 0.1, rl.GRAY)
-	rl.DrawLine3D(tri[0], tri[1], rl.BLUE)
-	rl.DrawLine3D(tri[0], tri[2], rl.BLUE)
-	rl.DrawLine3D(tri[1], tri[2], rl.BLUE)
+	handle_colliders()
+	// rl.DrawSphere(tri[0], 0.1, rl.WHITE)
+	// rl.DrawSphere(tri[1], 0.1, rl.YELLOW)
+	// rl.DrawSphere(tri[2], 0.1, rl.GRAY)
+	// rl.DrawLine3D(tri[0], tri[1], rl.BLUE)
+	// rl.DrawLine3D(tri[0], tri[2], rl.BLUE)
+	// rl.DrawLine3D(tri[1], tri[2], rl.BLUE)
 	// avg := (tri[0] + tri[1] + tri[2]) / 3
 	// ab := tri[1] - tri[0]
 	// ac := tri[2] - tri[0]
