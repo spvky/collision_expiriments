@@ -13,6 +13,8 @@ Triangle :: [3]Vec3
 
 a, b, c: gc.Collider
 
+color: rl.Color
+
 init :: proc() {
 	camera = rl.Camera3D {
 		position = {0, 0, -10},
@@ -55,8 +57,11 @@ handle_colliders :: proc() {
 
 	if overlap, simplex := gc.gjk(a, b); overlap {
 		draw_simplex(simplex)
-		mtv := gc.solve_epa(simplex, a, b)
+		mtv := gc.solve_epa(simplex, b, a, true)
 		draw_mtv(mtv)
+		color = rl.GOLD
+	} else {
+		color = rl.GRAY
 	}
 }
 
@@ -74,7 +79,7 @@ draw_colliders :: proc() {
 		rl.DrawLine3D(edges[i][0], edges[i][1], rl.BEIGE)
 	}
 
-	rl.DrawSphere(sphere.center, sphere.radius, rl.GOLD)
+	rl.DrawSphere(sphere.center, sphere.radius, color)
 
 	rl.DrawSphere({0, 0, 0}, 0.1, rl.GRAY)
 }
