@@ -73,6 +73,8 @@ draw_colliders :: proc() {
 	}
 
 	rl.DrawSphere(sphere.center, sphere.radius, rl.GOLD)
+
+	rl.DrawSphere({0, 0, 0}, 0.1, rl.GRAY)
 }
 
 main :: proc() {
