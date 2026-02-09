@@ -20,30 +20,16 @@ init :: proc() {
 		up       = {0, 1, 0},
 	}
 
-	a = gc.Collision_Poly {
-		points = {
-			{6, 1, 1},
-			{4, 1, 1},
-			{4, 1, -1},
-			{6, 1, -1},
-			{6, -1, -1},
-			{6, -1, 1},
-			{4, -1, 1},
-			{4, -1, -1},
-		},
-	}
+	a = gc.make_collider_rect(Vec3{-2, 0, 0}, Vec3{2, 2, 2})
+
+	fmt.printfln("Points: %v", a.(gc.Collision_Poly).points)
 
 	b = gc.Collision_Sphere {
 		center = {0, 0, 0},
 		radius = 0.5,
 	}
 
-	c = gc.Collision_Sphere {
-		center = {-2, 0, 0},
-		radius = 0.7,
-	}
 
-	// tri = {{-1, 2, 0}, {2, 1, -1}, {-1, 0, 1}}
 	tri = {{-2, 2, 3}, {2, 2, 3}, {0, -2, 3}}
 }
 
@@ -68,23 +54,25 @@ handle_colliders :: proc() {
 	if overlap, simplex := gc.gjk(a, b); overlap {
 		draw_simplex(simplex)
 		mtv := gc.solve_epa(simplex, a, b)
-		fmt.printfln("MTV %v", mtv)
+		// fmt.printfln("MTV %v", mtv)
 	}
 }
 
 draw_colliders :: proc() {
 	cube := a.(gc.Collision_Poly)
 	sphere := b.(gc.Collision_Sphere)
-	sphere2 := c.(gc.Collision_Sphere)
 
-	for i in 0 ..< 7 {
-		rl.DrawLine3D(cube.points[i], cube.points[i + 1], rl.BEIGE)
+	edges := gc.collider_rect_edges(a)
+
+	for i in 0 ..< 8 {
 		rl.DrawSphere(cube.points[i], 0.1, rl.BEIGE)
 	}
-	rl.DrawLine3D(cube.points[0], cube.points[7], rl.BEIGE)
-	rl.DrawSphere(cube.points[7], 0.1, rl.BEIGE)
+
+	for i in 0 ..< 12 {
+		rl.DrawLine3D(edges[i][0], edges[i][1], rl.BEIGE)
+	}
+
 	rl.DrawSphere(sphere.center, sphere.radius, rl.GOLD)
-	// rl.DrawSphere(sphere2.center, sphere2.radius, rl.BROWN)
 }
 
 main :: proc() {
