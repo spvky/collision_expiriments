@@ -22,7 +22,9 @@ init :: proc() {
 
 	a = gc.make_collider_rect(Vec3{-2, 0, 0}, Vec3{2, 2, 2})
 
-	fmt.printfln("Points: %v", a.(gc.Collision_Poly).points)
+
+	c = gc.make_collider_rect(Vec3{2, 0, 0}, Vec3{2, 2, 2})
+
 
 	b = gc.Collision_Sphere {
 		center = {0, 0, 0},
@@ -54,7 +56,7 @@ handle_colliders :: proc() {
 	if overlap, simplex := gc.gjk(a, b); overlap {
 		draw_simplex(simplex)
 		mtv := gc.solve_epa(simplex, a, b)
-		// fmt.printfln("MTV %v", mtv)
+		draw_mtv(mtv)
 	}
 }
 
@@ -101,6 +103,10 @@ draw_simplex :: proc(simplex: gc.Simplex) {
 	rl.DrawLine3D(simplex.b, simplex.c, rl.GREEN)
 	rl.DrawLine3D(simplex.b, simplex.d, rl.GREEN)
 	rl.DrawLine3D(simplex.c, simplex.d, rl.GREEN)
+}
+
+draw_mtv :: proc(mtv: Vec3) {
+	rl.DrawLine3D({0, 0, 0}, mtv, rl.RED)
 }
 
 update :: proc() {
